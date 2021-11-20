@@ -9,6 +9,7 @@
     <modules>
         <module>01jvm</module>
         <module>02jvm_2</module>
+        <module>03nio</module>
     </modules>
     <name>java-course-code</name>
     <description>Demo project for Spring Boot</description>

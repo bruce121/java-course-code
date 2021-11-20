@@ -42,6 +42,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 public class HttpOutboundHandler {
 
     private CloseableHttpAsyncClient httpClient;
+    private OkHttpClient okHttpClient;
     private ExecutorService executorService;
     private final List<String> backendUrls;
 
@@ -79,6 +80,10 @@ public class HttpOutboundHandler {
                 .build();
 
         httpClient.start();
+
+        okHttpClient = new OkHttpClient()
+                .newBuilder()
+                .build();
     }
 
 
@@ -106,37 +111,32 @@ public class HttpOutboundHandler {
     }
 
     private void forwardRequestByOkHttp3Client(FullHttpRequest fullHttpRequest, ChannelHandlerContext ctx, String url) {
-        DefaultFullHttpResponse finalResponse = null;
-
-        OkHttpClient client = new OkHttpClient()
-                .newBuilder()
-                .build();
+        DefaultFullHttpResponse nettyResponse = null;
 
         Request request = new Request.Builder()
                 .url(url)
                 .method("GET", null)
                 .build();
         try {
-            Response response = client.newCall(request).execute();
+            Response okHttpResponse = okHttpClient.newCall(request).execute();
 
-            byte[] body = response.body().bytes();
+            byte[] body = okHttpResponse.body().bytes();
 
-            finalResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK, Unpooled.wrappedBuffer(body));
-            finalResponse.headers().set("Content-Type", "application/json");
-            // response.headers().set("Transfer-Encoding", endPointResponse.getFirstHeader("Transfer-Encoding").getValue());
-            finalResponse.headers().set("Content-Length", finalResponse.content().readableBytes());
-
+            nettyResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK, Unpooled.wrappedBuffer(body));
+            nettyResponse.headers().set("Content-Type", "application/json");
+            nettyResponse.headers().set("Content-Length", nettyResponse.content().readableBytes());
+            filter.filter(nettyResponse);
         } catch (IOException e) {
             e.printStackTrace();
-            finalResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, NO_CONTENT);
+            nettyResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, NO_CONTENT);
             exceptionCaught(ctx, e);
         } finally {
 
             if (fullHttpRequest != null) {
                 if (!HttpUtil.isKeepAlive(fullHttpRequest)) {
-                    ctx.write(finalResponse).addListener(ChannelFutureListener.CLOSE);
+                    ctx.write(nettyResponse).addListener(ChannelFutureListener.CLOSE);
                 } else {
-                    ctx.write(finalResponse);
+                    ctx.write(nettyResponse);
                 }
             }
 

@@ -10,6 +10,9 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.concurrent.FutureCallback;
@@ -93,8 +96,55 @@ public class HttpOutboundHandler {
 
     }
 
-    private void fetchGet(final FullHttpRequest inbound, ChannelHandlerContext ctx, String url) {
+    private void fetchGet(final FullHttpRequest fullHttpRequest, ChannelHandlerContext ctx, String url) {
 
+        // http client 调用
+        // forwardRequestByHttpClient(inbound, ctx, url);
+
+        // ok http3 调用
+        forwardRequestByOkHttp3Client(fullHttpRequest, ctx, url);
+    }
+
+    private void forwardRequestByOkHttp3Client(FullHttpRequest fullHttpRequest, ChannelHandlerContext ctx, String url) {
+        DefaultFullHttpResponse finalResponse = null;
+
+        OkHttpClient client = new OkHttpClient()
+                .newBuilder()
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .method("GET", null)
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+
+            byte[] body = response.body().bytes();
+
+            finalResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK, Unpooled.wrappedBuffer(body));
+            finalResponse.headers().set("Content-Type", "application/json");
+            // response.headers().set("Transfer-Encoding", endPointResponse.getFirstHeader("Transfer-Encoding").getValue());
+            finalResponse.headers().set("Content-Length", finalResponse.content().readableBytes());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            finalResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, NO_CONTENT);
+            exceptionCaught(ctx, e);
+        } finally {
+
+            if (fullHttpRequest != null) {
+                if (!HttpUtil.isKeepAlive(fullHttpRequest)) {
+                    ctx.write(finalResponse).addListener(ChannelFutureListener.CLOSE);
+                } else {
+                    ctx.write(finalResponse);
+                }
+            }
+
+            ctx.flush();
+        }
+    }
+
+    private void forwardRequestByHttpClient(FullHttpRequest inbound, ChannelHandlerContext ctx, String url) {
         HttpGet httpGet = new HttpGet(url);
         httpGet.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_KEEP_ALIVE);
         httpGet.setHeader("mao", inbound.headers().get("mao"));
@@ -109,7 +159,6 @@ public class HttpOutboundHandler {
                     ex.printStackTrace();
                 }
             }
-
 
             @Override
             public void failed(Exception e) {

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="c1" class="com.bruce121.homework.model.Student">
+        <constructor-arg name="name" value="小C1"/>
+    </bean>
+
+    <bean id="d1" class="com.bruce121.homework.model.Student">
+        <constructor-arg name="name" value="小D1"/>
+    </bean>
+
+    <bean id="k2" class="com.bruce121.homework.model.Klass">
+        <property name="name" value="B班"/>
+        <property name="students">
+            <list>
+                <ref bean="c1"/>
+                <ref bean="d1"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="huada" class="com.bruce121.homework.model.School">
+        <property name="name" value="华大"/>
+        <property name="klasses">
+            <list>
+                <ref bean="k2"/>
+            </list>
+        </property>
+    </bean>
+</beans>

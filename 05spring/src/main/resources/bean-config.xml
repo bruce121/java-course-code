@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-    http://www.springframework.org/schema/beans
-    http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <bean id="c1" class="com.bruce121.homework.model.Student">
         <constructor-arg name="name" value="小C1"/>
@@ -31,4 +30,19 @@
             </list>
         </property>
     </bean>
+
+    <bean id="schoolAspectXml" class="com.bruce121.homework.aspect.SchoolAspectXml">
+    </bean>
+
+    <aop:aspectj-autoproxy/>
+
+    <aop:config>
+        <aop:pointcut id="pointCutXml" expression="execution(* com.bruce121.homework.service.SchoolService.*Money(..))"/>
+        <aop:aspect ref="schoolAspectXml">
+            <aop:before method="doSomethingBefore" pointcut-ref="pointCutXml"/>
+            <aop:around method="doSomethingAround" pointcut-ref="pointCutXml"/>
+            <aop:after-returning method="doSomethingAfter" pointcut-ref="pointCutXml"/>
+        </aop:aspect>
+    </aop:config>
+
 </beans>

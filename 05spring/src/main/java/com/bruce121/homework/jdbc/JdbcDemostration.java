@@ -1,6 +1,11 @@
 package com.bruce121.homework.jdbc;
 
-import java.sql.*;
+import com.zaxxer.hikari.HikariDataSource;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * @ClassName: JdbcDemostration
@@ -21,10 +26,24 @@ public class JdbcDemostration {
         // 加载驱动类，会自动执行静态代码块中的内容
         Class.forName("com.mysql.cj.jdbc.Driver");
         // 获得连接
-        String url = "jdbc:mysql://localhost:3306/student";
+        String url = "jdbc:mysql://localhost:3306/db-test";
         String user = "root";
         String password = "123456";
-        Connection conn = DriverManager.getConnection(url, user, password);
+        Connection conn = null;
+        // 原生获取数据连接
+        // conn = DriverManager.getConnection(url, user, password);
+
+        // 使用线程池获取连接
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(url);
+        dataSource.setUsername(user);
+        dataSource.setPassword(password);
+        dataSource.setAutoCommit(true);
+        dataSource.setConnectionTestQuery("select 1");
+        dataSource.setMaximumPoolSize(10);
+        dataSource.setPoolName("Demo-Hikari");
+
+        conn = dataSource.getConnection();
 
         try {
             insert(conn);

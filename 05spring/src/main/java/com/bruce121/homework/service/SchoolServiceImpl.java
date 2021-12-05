@@ -37,6 +37,11 @@ public class SchoolServiceImpl implements SchoolService {
         System.out.println("升国旗了!");
     }
 
+    @Override
+    public String sayWelcome() {
+        return "学生们会健康成长的。";
+    }
+
     public void schoolCelebration() {
         System.out.println("举办校庆!");
     }

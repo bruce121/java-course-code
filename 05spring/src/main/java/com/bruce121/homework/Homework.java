@@ -33,6 +33,9 @@ public class Homework implements CommandLineRunner {
     @Resource(name = "huada")
     private School huada;
 
+    @Resource(name = "qingbei2")
+    private School qingbei2;
+
     public static void main(String[] args) {
         SpringApplication.run(Homework.class, args);
     }
@@ -65,6 +68,10 @@ public class Homework implements CommandLineRunner {
         SchoolServiceImpl schoolServiceImpl = new SchoolServiceImpl();
         SchoolServiceImpl schoolServiceCglibProxy = (SchoolServiceImpl) new CglibProxyFactory(schoolServiceImpl).getProxyObject();
         schoolServiceCglibProxy.schoolCelebration();
+
+        // 使用SpringbootStarter 实现自动装配的bean
+        System.out.println(qingbei2);
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>");
     }
 
 }

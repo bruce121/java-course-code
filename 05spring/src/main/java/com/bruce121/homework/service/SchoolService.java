@@ -23,4 +23,11 @@ public interface SchoolService {
      * 升国旗
      */
     void raiseUpRedFlag();
+
+    /**
+     * 欢迎开学，有话对家长说
+     *
+     * @return 对家长说的话
+     */
+    String sayWelcome();
 }

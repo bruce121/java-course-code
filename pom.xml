@@ -11,6 +11,7 @@
         <module>02jvm_2</module>
         <module>03nio</module>
         <module>04concurrency</module>
+        <module>06mysql</module>
     </modules>
     <name>java-course-code</name>
     <description>Demo project for Spring Boot</description>

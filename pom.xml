@@ -12,6 +12,8 @@
         <module>03nio</module>
         <module>04concurrency</module>
         <module>06mysql</module>
+        <module>_08replica</module>
+        <module>_08sharding_algorithm</module>
     </modules>
     <name>java-course-code</name>
     <description>Demo project for Spring Boot</description>
@@ -25,6 +27,12 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>29.0-jre</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shardingsphere</groupId>
+            <artifactId>sharding-core-api</artifactId>
+            <version>4.1.1</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

@@ -11,4 +11,6 @@ public interface OrderService {
     int update(OrderEntity order);
 
     OrderEntity get(String id);
+
+    void xaTest();
 }

@@ -79,4 +79,12 @@ public class OrderController {
         orderService.delete(orderId);
         return ResponseEntity.ok("success");
     }
+
+    @ResponseBody
+    @GetMapping(path = "/xa_test")
+    public ResponseEntity<String> xa_test() {
+
+        orderService.xaTest();
+        return ResponseEntity.ok("success");
+    }
 }
